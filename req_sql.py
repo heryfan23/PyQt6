@@ -1,14 +1,17 @@
 import sqlite3
 
-def Inserer_pers(nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule):
+
+def Inserer_pers(nom, pseudo, age, contact, email, date, password, sexe, images, nationalites, matricule):
     connection = sqlite3.connect("base.db")
     cu = connection.cursor()
     sql = "INSERT INTO personnels(nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
-    valeur = (nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule)
-    cu.execute(sql,valeur)
+    valeur = (nom, pseudo, age, contact, email, date,
+              password, sexe, images, nationalites, matricule)
+    cu.execute(sql, valeur)
 
     connection.commit()
     connection.close()
+
 
 def affficher_pers():
     connection = sqlite3.connect("base.db")
@@ -22,24 +25,52 @@ def affficher_pers():
     return res
 
 # print(affficher_pers())
+
+
 def suppression(id):
     connection = sqlite3.connect("base.db")
     cu = connection.cursor()
     sql = "DELETE FROM personnels WHERE id = ?"
-    cu.execute(sql,(id,))
+    cu.execute(sql, (id,))
     connection.commit()
     connection.close()
+
+
+def modifier(id, nom, pseudo, age, contact, email, date, sexe, nationalites, matricule):
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+
+    sql = f"UPDATE personnels SET nom = ?,pseudo = ?,age = ?,contact = ?,email=?,date = ?,sexe = ?,nationalites = ?,matricule = ? WHERE id = {id}"
+
+    val_modif = (nom, pseudo, age, contact, email,
+                 date, sexe, nationalites, matricule)
+
+    cu.execute(sql, val_modif)
+    connection.commit()
+    connection.close()
+
+
+def faire_rechercher(mot):
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+
+    sql = "SELECT id,nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule FROM personnels WHERE nom LIKE ? OR pseudo LIKE ? OR matricule LIKE ?"
+    data = cu.execute(sql,(f"%{mot}", f"%{mot}",f"%{mot}"))
     
-def modifier(id,nom,pseudo,age,contact,email,date,sexe,nationalites,matricule):
+    res = data.fetchall()
+    connection.close()
+    return res
+
+def inserer_postes(nom,description):
     connection = sqlite3.connect("base.db")
     cu = connection.cursor()
     
-    sql = f"UPDATE personnels SET nom = ?,pseudo = ?,age = ?,contact = ?,email=?,date = ?,sexe = ?,nationalites = ?,matricule = ? WHERE id = {id}"
+    sql = "INSERT INTO postes(nom_poste,description) VALUES (?,?)"
+    valeur = (nom,description)
     
-    val_modif = (nom,pseudo,age,contact,email,date,sexe,nationalites,matricule)
-    
-    cu.execute(sql,val_modif)
+    cu.execute(sql,valeur)
     connection.commit()
     connection.close()
     
-    
+inserer_postes("Informaticien","Postes Python")
+inserer_postes("Mecanicien","Specialises Moteur")

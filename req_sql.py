@@ -14,16 +14,16 @@ def Inserer_pers(nom, pseudo, age, contact, email, date, password, sexe, images,
     connection.close()
 
 
-def affficher_pers():
-    connection = sqlite3.connect("base.db")
-    cu = connection.cursor()
-    sql = "SELECT id,nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule FROM personnels"
-    data = cu.execute(sql)
-    res = data.fetchall()
+# def affficher_pers():
+#     connection = sqlite3.connect("base.db")
+#     cu = connection.cursor()
+#     sql = "SELECT id,nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule,postes_id FROM personnels"
+#     data = cu.execute(sql)
+#     res = data.fetchall()
 
-    connection.close()
+#     connection.close()
 
-    return res
+#     return res
 
 # print(affficher_pers())
 
@@ -105,3 +105,17 @@ def prend_idposte(nom_poste):
     return resu
 
 # print(prend_idposte("Mecanicien")[0])
+
+def affficher_pers():
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+    
+    sql = """SELECT personnels.id,nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule,postes.nom_poste FROM personnels
+    LEFT JOIN postes ON personnels.postes_id = postes.id
+    """
+    
+    data = cu.execute(sql)
+    res = data.fetchall()
+    
+    connection.close()
+    return res

@@ -205,7 +205,6 @@ class Ajout(QWidget):
         msg.setStandardButtons(QMessageBox.StandardButton.Ok)
         msg.exec()
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     fen = Ajout()

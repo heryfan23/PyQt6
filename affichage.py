@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QAbstractItemView, QFrame, QMessageBox
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QAbstractItemView, QFrame, QMessageBox,QFileDialog
 import sys
 from PyQt6.QtCore import QDate, Qt
 from PyQt6.QtGui import QPixmap, QColor
 import os
-from req_sql import affficher_pers, suppression, modifier, faire_rechercher,prend_postes
+from req_sql import affficher_pers, suppression, modifier, faire_rechercher, prend_postes
+from openpyxl import Workbook
 
 
 class Affichage(QWidget):
@@ -35,14 +36,14 @@ class Affichage(QWidget):
         self.btn_rech.clicked.connect(self.rechercher)
 
         nbr_ligne = len(donner_pers)
-        nbr_colonne = 14
+        nbr_colonne = 15
 
         self.table = QTableWidget(nbr_ligne, nbr_colonne, self)
         # self.table.setRowCount(10)
         # self.table.setColumnCount(13)
         self.table.setGeometry(100, 150, 850, 400)
         self.table.setHorizontalHeaderLabels(["id", "Nom", "pseudo", "age", "contact", "email", "date",
-                                             "password", "sexe", "image", "nationaliter", "matricule", "modifier", "supprimer"])
+                                             "password", "sexe", "image", "nationaliter", "matricule","postes", "modifier", "supprimer"])
 
         self.table.setStyleSheet("""
             QTableWidget{
@@ -76,12 +77,12 @@ class Affichage(QWidget):
         for i in range(nbr_ligne):
             btn_modifier = QPushButton("Modifier")
             btn_modifier.setStyleSheet("background-color:aqua")
-            self.table.setCellWidget(i, 12, btn_modifier)
+            self.table.setCellWidget(i, 13, btn_modifier)
             btn_modifier.clicked.connect(self.modifier(i))
 
             btn_supr = QPushButton("Supprimer")
             btn_supr.setStyleSheet("background-color:aqua")
-            self.table.setCellWidget(i, 13, btn_supr)
+            self.table.setCellWidget(i, 14, btn_supr)
             btn_supr.clicked.connect(self.supprimer(i))
 
         for ligne, liste in enumerate(donner_pers):
@@ -116,7 +117,31 @@ class Affichage(QWidget):
         self.btn_close.clicked.connect(self.fermer)
 
         self.fenetre_popup.setVisible(False)
-
+        
+        self.btn_excel = QPushButton(self,text="Imprimer Excel")
+        self.btn_excel.setGeometry(500,550,200,30)
+        self.btn_excel.clicked.connect(self.importer_excel)
+        
+    def importer_excel(self):
+        try:
+            donner = affficher_pers()
+            ouvr_excel = Workbook()
+            fenetre_excel = ouvr_excel.active
+            
+            header = ["Numero","nom","pseudo","age","contact","email","date","password","sexe","images","nationalites","matricule","nom_poste"]
+            
+            fenetre_excel.append(header)
+            
+            for listes in donner:
+                fenetre_excel.append(listes)
+            
+            dest,_ = QFileDialog.getSaveFileName(self,"Enregistrer","","Fichiers Excle(*.xslx)")
+            
+            ouvr_excel.save(dest)
+            
+        except ValueError as e:
+            print(f"erreur {e}")
+            
     def fermer(self):
         self.fenetre_popup.setVisible(False)
 

@@ -3,7 +3,7 @@ import sys
 from PyQt6.QtCore import QDate, Qt
 from PyQt6.QtGui import QPixmap, QColor
 import os
-from req_sql import affficher_pers, suppression, modifier, faire_rechercher
+from req_sql import affficher_pers, suppression, modifier, faire_rechercher,prend_postes
 
 
 class Affichage(QWidget):

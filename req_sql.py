@@ -1,12 +1,13 @@
 import sqlite3
 
 
-def Inserer_pers(nom, pseudo, age, contact, email, date, password, sexe, images, nationalites, matricule):
+def Inserer_pers(nom, pseudo, age, contact, email, date, password, sexe, images, nationalites, matricule,postes_id):
     connection = sqlite3.connect("base.db")
     cu = connection.cursor()
-    sql = "INSERT INTO personnels(nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,matricule) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+    sql = "INSERT INTO personnels(nom,pseudo,age,contact,email,date,password,sexe,images,nationalites,postes_id,matricule) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
     valeur = (nom, pseudo, age, contact, email, date,
-              password, sexe, images, nationalites, matricule)
+              password, sexe, images, nationalites,postes_id,matricule)
+    
     cu.execute(sql, valeur)
 
     connection.commit()
@@ -72,5 +73,35 @@ def inserer_postes(nom,description):
     connection.commit()
     connection.close()
     
-inserer_postes("Informaticien","Postes Python")
-inserer_postes("Mecanicien","Specialises Moteur")
+# inserer_postes("Informaticien","Postes Python")
+# inserer_postes("Mecanicien","Specialises Moteur")
+
+def prend_postes():
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+    
+    sql = "SELECT DISTINCT nom_poste FROM postes"
+    
+    data = cu.execute(sql)
+    res = data.fetchall()
+    connection.close()
+    return res
+
+# print(prend_postes())
+
+def prend_idposte(nom_poste):
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+    
+    sql = f"SELECT id FROM postes WHERE nom_poste = ?"
+    
+    nom = (nom_poste)
+    
+    data = cu.execute(sql,(nom,))
+    resu = data.fetchone()
+    
+    connection.close()
+    
+    return resu
+
+# print(prend_idposte("Mecanicien")[0])

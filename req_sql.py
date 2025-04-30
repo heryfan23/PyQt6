@@ -119,3 +119,14 @@ def affficher_pers():
     
     connection.close()
     return res
+
+def pred_selectionner(id):
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+    
+    sql = f"SELECT * FROM personnels WHERE id = {id}"
+    data = cu.execute(sql)
+    res = data.fetchall()
+    connection.close()
+    
+    return res

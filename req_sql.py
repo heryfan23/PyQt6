@@ -130,3 +130,21 @@ def pred_selectionner(id):
     connection.close()
     
     return res
+
+def donner_postes(valeur):
+    connection = sqlite3.connect("base.db")
+    cu = connection.cursor()
+    
+    sql = f"SELECT personnels.id,personnels.nom,personnels.pseudo,personnels.age,personnels.contact,personnels.email,personnels.date,personnels.password,personnels.sexe,personnels.images,personnels.nationalites,personnels.matricule,postes.nom_poste FROM personnels JOIN postes ON personnels.postes_id = postes.id WHERE postes.nom_poste = '{valeur}'"
+    data = cu.execute(sql)
+    
+    res = data.fetchall()
+    
+    connection.close()
+    return res
+    
+    
+# print(donner_postes('Mecanicien'))
+    
+    
+    

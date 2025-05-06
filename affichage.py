@@ -1,9 +1,9 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QAbstractItemView, QFrame, QMessageBox,QFileDialog
+from PyQt6.QtWidgets import QApplication, QWidget, QLineEdit, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QAbstractItemView, QFrame, QMessageBox,QFileDialog,QComboBox
 import sys
 from PyQt6.QtCore import QDate, Qt
 from PyQt6.QtGui import QPixmap, QColor
 import os
-from req_sql import affficher_pers, suppression, modifier, faire_rechercher, prend_postes,pred_selectionner
+from req_sql import affficher_pers, suppression, modifier, faire_rechercher, prend_postes,pred_selectionner,donner_postes
 from openpyxl import Workbook
 import pdfkit
 
@@ -25,16 +25,26 @@ class Affichage(QWidget):
         self.nbr.setStyleSheet("font-size:25px")
 
         self.input_recherche = QLineEdit(self)
-        self.input_recherche.setGeometry(400, 50, 200, 35)
+        self.input_recherche.setGeometry(300, 50, 200, 35)
         self.input_recherche.setStyleSheet(
             "border:2px solid red;border-radius:15px;font-size:15px;padding-left:10px")
 
         self.btn_rech = QPushButton(self, text="Rechercher")
-        self.btn_rech.setGeometry(620, 50, 100, 35)
+        self.btn_rech.setGeometry(520, 50, 100, 35)
         self.btn_rech.setStyleSheet(
             "background-color:red;color:white;border-radius:10px")
         self.btn_rech.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_rech.clicked.connect(self.rechercher)
+        
+        option = ["Postes"]
+        postes = prend_postes()
+        for poste in postes:
+            option.append(poste[0])
+        
+        self.filtre_postes = QComboBox(self)
+        self.filtre_postes.setGeometry(700,50,150,35)
+        self.filtre_postes.addItems(option)
+        self.filtre_postes.currentIndexChanged.connect(self.aff_filtre)
 
         nbr_ligne = len(donner_pers)
         nbr_colonne = 15
@@ -126,6 +136,45 @@ class Affichage(QWidget):
         self.btn_pdf = QPushButton(self,text="Imprimer pdf")
         self.btn_pdf.setGeometry(500,550,200,30)
         self.btn_pdf.clicked.connect(self.importer_pdf)
+    
+    def aff_filtre(self,index):
+        valeur = self.filtre_postes.currentText()
+        # print(valeur)
+        
+        resultats = donner_postes(valeur)
+        self.table.setRowCount(len(resultats))
+        
+        
+        for i in range(len(resultats)):
+            btn_modifier = QPushButton("Modifier")
+            btn_modifier.setStyleSheet("background-color:aqua")
+            self.table.setCellWidget(i, 13, btn_modifier)
+            btn_modifier.clicked.connect(self.modifier(i))
+
+            btn_supr = QPushButton("Supprimer")
+            btn_supr.setStyleSheet("background-color:aqua")
+            self.table.setCellWidget(i, 14, btn_supr)
+            btn_supr.clicked.connect(self.supprimer(i))
+
+        for ligne, liste in enumerate(resultats):
+            for col, value in enumerate(liste):
+                if col == 9:
+                    if value:
+                        label = QLabel()
+                        pixmap = QPixmap(f"images_pers/{value}")
+                        taille_image = pixmap.scaled(50, 50)
+                        label.setPixmap(taille_image)
+                        self.table.setCellWidget(ligne, col, label)
+                        item = QTableWidgetItem(f"images_pers/{value}")
+                        self.table.setItem(ligne, 9, item)
+
+                        item.setForeground(QColor(240, 248, 255, 0))
+                else:
+                    item = QTableWidgetItem(str(value))
+                    self.table.setItem(ligne, col, item)
+        
+        
+        
     def affiche_image(self, item):
         res = self.table.selectedItems()
         res.sort(key=lambda x: x.row())
